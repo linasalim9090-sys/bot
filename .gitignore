@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+
+# Runtime data
+data/
+logs/
+backups/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Tooling
+.superpowers/
+*.tsbuildinfo
