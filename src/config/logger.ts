@@ -4,20 +4,27 @@ import type { Env } from './env.js';
 
 export type Logger = pino.Logger;
 
+const SECRET_KEYS = [
+  'token',
+  'DISCORD_TOKEN',
+  'access_token',
+  'refresh_token',
+  'botToken',
+  'authorization',
+  'cookie',
+  'password',
+  'secret',
+] as const;
+
+const MAX_NESTING_DEPTH = 4;
+
+// Pino wildcards match one object level each, so generate paths for every
+// secret key at the top level and at one through four levels of nesting.
 const redact = {
-  paths: [
-    'token',
-    'DISCORD_TOKEN',
-    'authorization',
-    'cookie',
-    'password',
-    'secret',
-    '*.token',
-    '*.authorization',
-    '*.cookie',
-    '*.password',
-    '*.secret',
-  ],
+  paths: SECRET_KEYS.flatMap((key) => [
+    key,
+    ...Array.from({ length: MAX_NESTING_DEPTH }, (_, depth) => `${'*.'.repeat(depth + 1)}${key}`),
+  ]),
   censor: '[Redacted]',
 };
 
