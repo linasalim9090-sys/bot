@@ -1,20 +1,14 @@
-# Dependencies
 node_modules/
-
-# Build output
 dist/
-coverage/
-
-# Runtime data
-data/
-logs/
-backups/
-
-# Secrets
 .env
 .env.*
 !.env.example
-
-# Tooling
+data/
+logs/
+backups/
+coverage/
 .superpowers/
+*.log
 *.tsbuildinfo
+.DS_Store
+Thumbs.db
