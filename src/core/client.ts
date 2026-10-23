@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Partials } from 'discord.js';
+import { Client, GatewayIntentBits, Options, Partials } from 'discord.js';
 import type { Logger } from 'pino';
 
 export function createClient(): Client {
@@ -23,6 +23,13 @@ export function createClient(): Client {
       Partials.User,
     ],
     allowedMentions: { parse: [], repliedUser: false },
+    sweepers: {
+      ...Options.DefaultSweeperSettings,
+      messages: {
+        interval: 3600,
+        lifetime: 1800,
+      },
+    },
   });
 }
 

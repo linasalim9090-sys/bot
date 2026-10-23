@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { existsSync } from 'node:fs';
+import { createServer } from 'node:http';
 import path from 'node:path';
 import { ActivityType, type Interaction } from 'discord.js';
 import { loadEnv } from './config/env.js';
@@ -91,9 +92,26 @@ export async function main(): Promise<void> {
 
   registerEvents(client, [clientReadyEvent, interactionCreateEvent], logger);
 
+  // Start health server for cloud platforms (Render, Koyeb, etc.)
+  const port = Number(process.env.PORT || 3000);
+  const healthServer = createServer((_req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        status: 'ok',
+        uptime: Math.floor(process.uptime()),
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  });
+  healthServer.listen(port, () => {
+    logger.info({ port }, 'Health-check HTTP server listening.');
+  });
+
   // Process signals
   const handleExitSignal = async (signal: string) => {
     logger.info({ signal }, 'Received exit signal');
+    healthServer.close();
     await shutdown(client, sqlite, logger);
     process.exit(0);
   };
