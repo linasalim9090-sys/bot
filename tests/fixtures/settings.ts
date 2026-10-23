@@ -13,6 +13,7 @@ export function makeSettings(overrides: Partial<GuildSettings> = {}): GuildSetti
     welcomeJson: {},
     ticketsJson: {},
     musicJson: {},
+    rolesJson: { ownerRoleIds: [] },
     createdAt: now,
     updatedAt: now,
     ...overrides,

@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import { loadEnv } from '../src/config/env.js';
 import { createDb, closeDb } from '../src/db/client.js';
 import { migrateDb } from '../src/db/migrate.js';
 
-const env = loadEnv();
-const { sqlite, db } = createDb(env.DATABASE_PATH);
+const databasePath = process.env.DATABASE_PATH || './data/bot.db';
+const { sqlite, db } = createDb(databasePath);
 try {
   migrateDb(db);
   console.log('Migrations applied.');

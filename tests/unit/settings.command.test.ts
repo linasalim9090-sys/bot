@@ -134,6 +134,45 @@ describe('settings command', () => {
     await expect(settingsCommand.execute(ctx)).rejects.toThrowError(CommandError);
   });
 
+  it('roles updates the configured owner role IDs', async () => {
+    const initial = await services.settings.get(GUILD_ID);
+    const interaction = createFakeInteraction({
+      deferred: true,
+      user: { id: OWNER_ID },
+      options: {
+        getSubcommand: vi.fn(() => 'roles'),
+        getRole: vi.fn((name) => {
+          if (name === 'role1') return { id: '900000000000000001' };
+          if (name === 'role2') return { id: '900000000000000002' };
+          return null;
+        }),
+        getBoolean: vi.fn(() => false),
+      },
+    });
+
+    const ctx: CommandContext = {
+      interaction,
+      client: {} as never,
+      env,
+      db: services.db,
+      registry: {} as never,
+      settings: initial,
+      settingsService: services.settings,
+      auditService: services.audit,
+      t: createTranslator('ar'),
+      logger: { info: vi.fn(), error: vi.fn() } as never,
+    };
+
+    await settingsCommand.execute(ctx);
+
+    expect(interaction.editReply).toHaveBeenCalledWith({
+      content: 'تم تحديث رتب مالك البوت بنجاح.',
+    });
+
+    const updated = await services.settings.get(GUILD_ID);
+    expect(updated.rolesJson.ownerRoleIds).toEqual(['900000000000000001', '900000000000000002']);
+  });
+
   it('reset rejects a non-owner and succeeds for the owner', async () => {
     const initial = await services.settings.get(GUILD_ID);
     const nonOwnerInteraction = createFakeInteraction({

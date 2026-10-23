@@ -34,6 +34,7 @@ export function createFakeInteraction(
       getInteger: vi.fn(),
       getBoolean: vi.fn(),
       getUser: vi.fn(),
+      getRole: vi.fn(),
       getSubcommand: vi.fn(),
     },
     ...overrides,

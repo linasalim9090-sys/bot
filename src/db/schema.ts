@@ -12,6 +12,10 @@ export const guildSettings = sqliteTable('guild_settings', {
   welcomeJson: text('welcome_json', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
   ticketsJson: text('tickets_json', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
   musicJson: text('music_json', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
+  rolesJson: text('roles_json', { mode: 'json' })
+    .$type<{ ownerRoleIds: string[] }>()
+    .notNull()
+    .default({ ownerRoleIds: [] }),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
 });

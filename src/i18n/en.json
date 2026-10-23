@@ -46,6 +46,8 @@
   "commands.settings.updated": "Settings updated.",
   "commands.settings.version": "Version",
   "commands.settings.modules": "Modules",
+  "commands.settings.ownerRoles": "Owner Roles",
+  "commands.settings.rolesUpdated": "Owner roles have been updated successfully.",
   "commands.settings.resetDone": "Settings have been reset to default.",
   "commands.settings.conflict": "Settings were modified elsewhere. Please retry.",
   "errors.invalidTimezone": "Invalid timezone.",

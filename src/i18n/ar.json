@@ -46,6 +46,8 @@
   "commands.settings.updated": "تم تحديث الإعدادات.",
   "commands.settings.version": "الإصدار",
   "commands.settings.modules": "الوحدات",
+  "commands.settings.ownerRoles": "رتب المالك",
+  "commands.settings.rolesUpdated": "تم تحديث رتب مالك البوت بنجاح.",
   "commands.settings.resetDone": "تمت إعادة الإعدادات إلى الوضع الافتراضي.",
   "commands.settings.conflict": "تم تعديل الإعدادات من مكان آخر. أعد المحاولة.",
   "errors.invalidTimezone": "المنطقة الزمنية غير صالحة.",

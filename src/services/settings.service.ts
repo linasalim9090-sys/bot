@@ -26,6 +26,7 @@ export interface GuildSettings {
   welcomeJson: Record<string, unknown>;
   ticketsJson: Record<string, unknown>;
   musicJson: Record<string, unknown>;
+  rolesJson: { ownerRoleIds: string[] };
   createdAt: number;
   updatedAt: number;
 }
@@ -55,6 +56,11 @@ const patchSchema = z.object({
   welcomeJson: z.record(z.string(), z.unknown()).optional(),
   ticketsJson: z.record(z.string(), z.unknown()).optional(),
   musicJson: z.record(z.string(), z.unknown()).optional(),
+  rolesJson: z
+    .object({
+      ownerRoleIds: z.array(z.string()).max(2),
+    })
+    .optional(),
 });
 
 export class SettingsService {
@@ -90,6 +96,7 @@ export class SettingsService {
       welcomeJson: {},
       ticketsJson: {},
       musicJson: {},
+      rolesJson: { ownerRoleIds: [] },
       createdAt: now,
       updatedAt: now,
     };

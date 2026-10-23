@@ -30,6 +30,38 @@ export interface GuardFailure {
 
 export type GuardResult = GuardFailure | { ok: true };
 
+export function isUserOwnerOrHasOwnerRole(
+  interaction: ChatInputCommandInteraction,
+  settings: GuildSettings,
+  env: Env,
+): boolean {
+  if (interaction.user.id === env.OWNER_ID) {
+    return true;
+  }
+
+  const ownerRoles = settings.rolesJson?.ownerRoleIds ?? [];
+  if (ownerRoles.length === 0) {
+    return false;
+  }
+
+  const member = interaction.member;
+  if (!member) {
+    return false;
+  }
+
+  const memberRoles = member.roles;
+  if (Array.isArray(memberRoles)) {
+    return memberRoles.some((roleId) => ownerRoles.includes(roleId));
+  }
+
+  if (typeof memberRoles === 'object' && memberRoles !== null && 'cache' in memberRoles) {
+    const cache = (memberRoles as { cache: { has: (id: string) => boolean } }).cache;
+    return ownerRoles.some((roleId) => cache.has(roleId));
+  }
+
+  return false;
+}
+
 export function checkGuards(input: GuardInput): GuardResult {
   const { interaction, command, settings, env, cooldowns, now } = input;
 
@@ -46,8 +78,8 @@ export function checkGuards(input: GuardInput): GuardResult {
     }
   }
 
-  // 3. Owner guard
-  if (command.meta.ownerOnly && interaction.user.id !== env.OWNER_ID) {
+  // 3. Owner guard (direct owner or has one of the configured owner roles)
+  if (command.meta.ownerOnly && !isUserOwnerOrHasOwnerRole(interaction, settings, env)) {
     return { ok: false, reason: 'owner', messageKey: 'errors.ownerOnly' };
   }
 

@@ -57,6 +57,22 @@ describe('checkGuards', () => {
     expect(failure).toMatchObject({ ok: false, reason: 'owner', messageKey: 'errors.ownerOnly' });
   });
 
+  it('allows a user who has one of the configured owner roles for ownerOnly commands', () => {
+    const interaction = createFakeInteraction({
+      user: { id: '999999999999999999' },
+      member: { roles: ['role-owner-1'] },
+    });
+    const result = checkGuards({
+      interaction,
+      command: { ...pingCommand, meta: { ...pingCommand.meta, ownerOnly: true } },
+      settings: makeSettings({ rolesJson: { ownerRoleIds: ['role-owner-1', 'role-owner-2'] } }),
+      env,
+      cooldowns: new CooldownService(),
+      now: 1000,
+    });
+    expect(result).toEqual({ ok: true });
+  });
+
   it('rejects a missing user permission', () => {
     const failure = checkGuards({
       interaction: createFakeInteraction({ memberPermissions: { has: () => false } }),

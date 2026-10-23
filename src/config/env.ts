@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import { EnvError } from './errors.js';
 
-const snowflake = z.string().regex(/^\d{17,20}$/, 'must be a Discord snowflake');
+const snowflake = z
+  .string()
+  .transform((val) => val.trim().replace(/,$/, ''))
+  .pipe(z.string().regex(/^\d{17,20}$/, 'must be a Discord snowflake'));
 
 const envSchema = z.object({
   DISCORD_TOKEN: z.string().min(50),
