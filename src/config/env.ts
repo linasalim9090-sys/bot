@@ -1,13 +1,22 @@
 import { z } from 'zod';
 import { EnvError } from './errors.js';
 
+function sanitizeInput(val: string): string {
+  return val.trim().replace(/^[,\s"']+|[,\s"']+$/g, '').trim();
+}
+
 const snowflake = z
   .string()
-  .transform((val) => val.trim().replace(/,$/, ''))
+  .transform(sanitizeInput)
   .pipe(z.string().regex(/^\d{17,20}$/, 'must be a Discord snowflake'));
 
+const token = z
+  .string()
+  .transform(sanitizeInput)
+  .pipe(z.string().min(50));
+
 const envSchema = z.object({
-  DISCORD_TOKEN: z.string().min(50),
+  DISCORD_TOKEN: token,
   CLIENT_ID: snowflake,
   GUILD_ID: snowflake,
   OWNER_ID: snowflake,

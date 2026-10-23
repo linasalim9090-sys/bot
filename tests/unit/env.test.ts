@@ -29,4 +29,14 @@ describe('loadEnv', () => {
   it('parses DRY_RUN=true', () => {
     expect(loadEnv({ ...valid, DRY_RUN: 'true' }).DRY_RUN).toBe(true);
   });
+
+  it('sanitizes quotes and trailing commas from tokens and snowflakes', () => {
+    const parsed = loadEnv({
+      ...valid,
+      DISCORD_TOKEN: `"${'y'.repeat(60)}"`,
+      GUILD_ID: '"223456789012345678",',
+    });
+    expect(parsed.DISCORD_TOKEN).toBe('y'.repeat(60));
+    expect(parsed.GUILD_ID).toBe('223456789012345678');
+  });
 });

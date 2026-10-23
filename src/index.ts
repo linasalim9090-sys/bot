@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ActivityType, type GuildMember, type Interaction, type Message } from 'discord.js';
 import { loadEnv } from './config/env.js';
 import { createLogger } from './config/logger.js';
@@ -20,6 +21,14 @@ import { TicketService } from './services/ticket.service.js';
 import { createEmbed } from './ui/embeds.js';
 
 export function getCommandsDirectory(): string {
+  try {
+    const urlDir = fileURLToPath(new URL('./modules', import.meta.url));
+    if (existsSync(urlDir)) {
+      return urlDir;
+    }
+  } catch {
+    // URL resolution fallback
+  }
   const distDir = path.join(process.cwd(), 'dist', 'modules');
   if (existsSync(distDir)) {
     return distDir;
@@ -94,33 +103,45 @@ export async function main(): Promise<void> {
 
       if (interaction.isButton()) {
         const t = createTranslator(env.DEFAULT_LOCALE);
-        const ticketService = new TicketService(db);
+        try {
+          const ticketService = new TicketService(db);
 
-        if (interaction.customId === 'ticket_open') {
-          if (!interaction.guild) return;
-          await interaction.deferReply({ ephemeral: true });
-          const res = await ticketService.createTicket(interaction.guild, interaction.user, t);
-          if (res.alreadyOpen) {
+          if (interaction.customId === 'ticket_open') {
+            if (!interaction.guild) return;
+            await interaction.deferReply({ ephemeral: true });
+            const res = await ticketService.createTicket(interaction.guild, interaction.user, t);
+            if (res.alreadyOpen) {
+              await interaction.editReply({
+                content: t('commands.ticket.alreadyOpen', { channel: `<#${res.channelId}>` }),
+              });
+              return;
+            }
             await interaction.editReply({
-              content: t('commands.ticket.alreadyOpen', { channel: `<#${res.channelId}>` }),
+              content: t('commands.ticket.created', { channel: `<#${res.channelId}>` }),
             });
             return;
           }
-          await interaction.editReply({
-            content: t('commands.ticket.created', { channel: `<#${res.channelId}>` }),
-          });
-          return;
-        }
 
-        if (interaction.customId === 'ticket_close') {
-          await interaction.deferReply({ ephemeral: true });
-          const closed = await ticketService.closeTicket(interaction.channelId);
-          if (!closed) {
-            await interaction.editReply({ content: t('commands.ticket.notTicket') });
+          if (interaction.customId === 'ticket_close') {
+            await interaction.deferReply({ ephemeral: true });
+            const closed = await ticketService.closeTicket(interaction.channelId);
+            if (!closed) {
+              await interaction.editReply({ content: t('commands.ticket.notTicket') });
+              return;
+            }
+            await interaction.editReply({ content: t('commands.ticket.closeDone') });
             return;
           }
-          await interaction.editReply({ content: t('commands.ticket.closeDone') });
-          return;
+        } catch (buttonErr) {
+          logger.error({ err: buttonErr }, 'Error handling button interaction');
+          const msg = t('errors.unexpected');
+          if (interaction.isRepliable()) {
+            if (interaction.deferred || interaction.replied) {
+              await interaction.editReply({ content: msg }).catch(() => {});
+            } else {
+              await interaction.reply({ content: msg, ephemeral: true }).catch(() => {});
+            }
+          }
         }
       }
     },
@@ -210,7 +231,27 @@ export async function main(): Promise<void> {
 
   // Login
   if (!env.DRY_RUN) {
-    await client.login(env.DISCORD_TOKEN);
+    try {
+      await client.login(env.DISCORD_TOKEN);
+    } catch (loginErr: unknown) {
+      const errMessage = loginErr instanceof Error ? loginErr.message : String(loginErr);
+      const isDisallowed =
+        errMessage.toLowerCase().includes('disallowed') ||
+        (typeof loginErr === 'object' &&
+          loginErr !== null &&
+          'code' in loginErr &&
+          (loginErr as { code?: string }).code === 'DisallowedIntents');
+
+      if (isDisallowed) {
+        logger.fatal(
+          'DISALLOWED INTENTS: Discord bot requires privileged Gateway Intents (GuildMembers and/or MessageContent). ' +
+            'Please enable them in the Discord Developer Portal: Applications -> Bot -> Privileged Gateway Intents.',
+        );
+      } else {
+        logger.fatal({ err: loginErr }, 'Failed to login to Discord');
+      }
+      throw loginErr;
+    }
   } else {
     logger.info('DRY_RUN is enabled. Skipping Discord gateway login.');
   }

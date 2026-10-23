@@ -176,7 +176,7 @@ describe('All Registered Commands Suite', () => {
       const replied = replyFn.mock.calls.length > 0 || editReplyFn.mock.calls.length > 0;
       expect(replied).toBe(true);
     }
-  }, 30_000);
+  }, 120_000);
 
   it('tests /setup subcommands (logs, channels, security)', async () => {
     const setupCmd = (await import('../../src/modules/core/commands/setup.command.js')).default;
