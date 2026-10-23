@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
-import { ActivityType, type Interaction } from 'discord.js';
+import { ActivityType, type GuildMember, type Interaction, type Message } from 'discord.js';
 import { loadEnv } from './config/env.js';
 import { createLogger } from './config/logger.js';
 import { createClient, registerEvents, shutdown } from './core/client.js';
@@ -14,7 +14,10 @@ import { createDb } from './db/client.js';
 import { migrateDb } from './db/migrate.js';
 import { createTranslator } from './i18n/index.js';
 import { AuditService } from './services/audit.service.js';
+import { LevelService } from './services/level.service.js';
 import { SettingsService } from './services/settings.service.js';
+import { TicketService } from './services/ticket.service.js';
+import { createEmbed } from './ui/embeds.js';
 
 export function getCommandsDirectory(): string {
   const distDir = path.join(process.cwd(), 'dist', 'modules');
@@ -86,11 +89,87 @@ export async function main(): Promise<void> {
           cooldowns,
           logger,
         });
+        return;
+      }
+
+      if (interaction.isButton()) {
+        const t = createTranslator(env.DEFAULT_LOCALE);
+        const ticketService = new TicketService(db);
+
+        if (interaction.customId === 'ticket_open') {
+          if (!interaction.guild) return;
+          await interaction.deferReply({ ephemeral: true });
+          const res = await ticketService.createTicket(interaction.guild, interaction.user, t);
+          if (res.alreadyOpen) {
+            await interaction.editReply({
+              content: t('commands.ticket.alreadyOpen', { channel: `<#${res.channelId}>` }),
+            });
+            return;
+          }
+          await interaction.editReply({
+            content: t('commands.ticket.created', { channel: `<#${res.channelId}>` }),
+          });
+          return;
+        }
+
+        if (interaction.customId === 'ticket_close') {
+          await interaction.deferReply({ ephemeral: true });
+          const closed = await ticketService.closeTicket(interaction.channelId);
+          if (!closed) {
+            await interaction.editReply({ content: t('commands.ticket.notTicket') });
+            return;
+          }
+          await interaction.editReply({ content: t('commands.ticket.closeDone') });
+          return;
+        }
       }
     },
   });
 
-  registerEvents(client, [clientReadyEvent, interactionCreateEvent], logger);
+  const levelService = new LevelService(db);
+  const messageCreateEvent = defineEvent({
+    name: 'messageCreate',
+    execute: async (message: Message) => {
+      if (!message.guild || message.author.bot) return;
+      try {
+        await levelService.addXp(message.guild.id, message.author.id, 20);
+      } catch (err) {
+        logger.error({ err }, 'Error in messageCreate event');
+      }
+    },
+  });
+
+  const guildMemberAddEvent = defineEvent({
+    name: 'guildMemberAdd',
+    execute: async (member: GuildMember) => {
+      try {
+        const settings = await settingsService.get(member.guild.id);
+        const welcome = settings.welcomeJson as { enabled?: boolean; channelId?: string };
+        if (welcome?.enabled && welcome?.channelId) {
+          const ch = member.guild.channels.cache.get(welcome.channelId);
+          if (ch && 'send' in ch && typeof ch.send === 'function') {
+            const t = createTranslator(settings.locale);
+            const embed = createEmbed({
+              title: 'Welcome',
+              description: `Welcome to the server, <@${member.id}>!`,
+              fields: [{ name: 'Member Count', value: String(member.guild.memberCount) }],
+              footer: { text: t('embeds.footer') },
+              timestamp: true,
+            });
+            await ch.send({ embeds: [embed] });
+          }
+        }
+      } catch (err) {
+        logger.error({ err }, 'Error in guildMemberAdd event');
+      }
+    },
+  });
+
+  registerEvents(
+    client,
+    [clientReadyEvent, interactionCreateEvent, messageCreateEvent, guildMemberAddEvent],
+    logger,
+  );
 
   // Start health server for cloud platforms (Render, Koyeb, etc.)
   const port = Number(process.env.PORT || 3000);

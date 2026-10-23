@@ -54,14 +54,17 @@ npm run build
 npm start
 ```
 
-## قائمة الأوامر المتاحة (59 أمرًا عبر 6 وحدات)
+## قائمة الأوامر المتاحة (65 أمرًا عبر 9 وحدات متكاملة)
 
 1. **النواة والإعداد (Core & Setup - 6 أوامر):** `/setup`, `/settings`, `/module`, `/doctor`, `/ping`, `/help`
-2. **الإشراف والرقابة (Moderation - 15 أمرًا):** `/ban`, `/unban`, `/kick`, `/timeout`, `/untimeout`, `/warn`, `/warnings`, `/clearwarn`, `/purge`, `/slowmode`, `/lock`, `/unlock`, `/nick`, `/giverole`, `/removerole`
-3. **الأدوات والمساعدة (Utility - 15 أمرًا):** `/userinfo`, `/serverinfo`, `/botinfo`, `/avatar`, `/banner`, `/roleinfo`, `/channelinfo`, `/poll`, `/announce`, `/remind`, `/calc`, `/timestamp`, `/snowflake`, `/color`, `/randomnumber`
-4. **التسلية والألعاب (Fun - 10 أوامر):** `/dice`, `/coinflip`, `/eightball`, `/rps`, `/choose`, `/quote`, `/rate`, `/reverse`, `/trivia`, `/mathquiz`
-5. **المجتمع والتفاعل (Community - 9 أوامر):** `/afk`, `/suggest`, `/report`, `/membercount`, `/rules`, `/emojis`, `/boosters`, `/roles`, `/invites`
-6. **الأمان والحماية (Security - 4 أوامر):** `/lockdown`, `/raidmode`, `/whitelist`, `/scan`
+2. **نظام التذاكر والدعم الفني (Tickets - أمر تفاعلي متقدم):** `/ticket` مع أوامر فرعية `[setup|close|add|remove]` وأزرار تفاعلية فورية لفتح وإغلاق التذاكر
+3. **نظام المستويات والنشاط (Leveling - أمران):** `/rank`, `/leaderboard` مع احتساب نقاط الخبرة (XP) والتفاعل تلقائيًا
+4. **النظام الاقتصادي والمالي (Economy - 3 أوامر):** `/balance`, `/daily`, `/pay` لإدارة المحفظة والبنك والمكافآت اليومية والتحويلات
+5. **الإشراف والرقابة (Moderation - 15 أمرًا):** `/ban`, `/unban`, `/kick`, `/timeout`, `/untimeout`, `/warn`, `/warnings`, `/clearwarn`, `/purge`, `/slowmode`, `/lock`, `/unlock`, `/nick`, `/giverole`, `/removerole`
+6. **الأدوات والمساعدة (Utility - 15 أمرًا):** `/userinfo`, `/serverinfo`, `/botinfo`, `/avatar`, `/banner`, `/roleinfo`, `/channelinfo`, `/poll`, `/announce`, `/remind`, `/calc`, `/timestamp`, `/snowflake`, `/color`, `/randomnumber`
+7. **التسلية والألعاب (Fun - 10 أوامر):** `/dice`, `/coinflip`, `/eightball`, `/rps`, `/choose`, `/quote`, `/rate`, `/reverse`, `/trivia`, `/mathquiz`
+8. **المجتمع والتفاعل (Community - 9 أوامر):** `/afk`, `/suggest`, `/report`, `/membercount`, `/rules`, `/emojis`, `/boosters`, `/roles`, `/invites`
+9. **الأمان والحماية (Security - 4 أوامر):** `/lockdown`, `/raidmode`, `/whitelist`, `/scan`
 
 ## جدول الأوامر البرمجية (NPM Scripts)
 

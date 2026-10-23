@@ -20,6 +20,35 @@ export function createDb(databasePath: string): {
   sqlite.pragma('synchronous = NORMAL');
   sqlite.pragma('temp_store = MEMORY');
   sqlite.pragma('cache_size = -64000');
+
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS tickets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      guild_id TEXT NOT NULL,
+      channel_id TEXT NOT NULL,
+      opener_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at INTEGER NOT NULL,
+      closed_at INTEGER
+    );
+    CREATE TABLE IF NOT EXISTS member_levels (
+      guild_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      xp INTEGER NOT NULL DEFAULT 0,
+      level INTEGER NOT NULL DEFAULT 1,
+      last_message_at INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (guild_id, user_id)
+    );
+    CREATE TABLE IF NOT EXISTS member_economy (
+      guild_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      wallet INTEGER NOT NULL DEFAULT 0,
+      bank INTEGER NOT NULL DEFAULT 0,
+      last_daily_at INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (guild_id, user_id)
+    );
+  `);
+
   const db = drizzle(sqlite, { schema });
   return { sqlite, db };
 }

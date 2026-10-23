@@ -58,3 +58,41 @@ export const jobs = sqliteTable(
   },
   (table) => [index('jobs_status_run_idx').on(table.status, table.runAt)],
 );
+
+export const tickets = sqliteTable(
+  'tickets',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    guildId: text('guild_id').notNull(),
+    channelId: text('channel_id').notNull(),
+    openerId: text('opener_id').notNull(),
+    status: text('status', { enum: ['open', 'closed'] }).notNull().default('open'),
+    createdAt: integer('created_at', { mode: 'number' }).notNull(),
+    closedAt: integer('closed_at', { mode: 'number' }),
+  },
+  (table) => [index('tickets_guild_channel_idx').on(table.guildId, table.channelId)],
+);
+
+export const memberLevels = sqliteTable(
+  'member_levels',
+  {
+    guildId: text('guild_id').notNull(),
+    userId: text('user_id').notNull(),
+    xp: integer('xp').notNull().default(0),
+    level: integer('level').notNull().default(1),
+    lastMessageAt: integer('last_message_at', { mode: 'number' }).notNull().default(0),
+  },
+  (table) => [index('member_levels_guild_idx').on(table.guildId, table.xp)],
+);
+
+export const memberEconomy = sqliteTable(
+  'member_economy',
+  {
+    guildId: text('guild_id').notNull(),
+    userId: text('user_id').notNull(),
+    wallet: integer('wallet').notNull().default(0),
+    bank: integer('bank').notNull().default(0),
+    lastDailyAt: integer('last_daily_at', { mode: 'number' }).notNull().default(0),
+  },
+  (table) => [index('member_economy_guild_idx').on(table.guildId, table.userId)],
+);

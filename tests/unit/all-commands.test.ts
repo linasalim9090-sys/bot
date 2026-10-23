@@ -2,10 +2,12 @@ import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { CommandContext } from '../../src/core/context.js';
 import { CommandRegistry } from '../../src/core/registry.js';
+import { createDb } from '../../src/db/client.js';
 import { createTranslator } from '../../src/i18n/index.js';
 
 describe('All Registered Commands Suite', () => {
   it('loads and verifies all commands meet requirements and execute safely', async () => {
+    const { db } = createDb(':memory:');
     const registry = new CommandRegistry();
     const modulesDir = path.join(process.cwd(), 'src', 'modules');
     await registry.loadFromDirectory(modulesDir);
@@ -14,7 +16,7 @@ describe('All Registered Commands Suite', () => {
     // Verify count is between 50 and 70
     expect(commands.length).toBeGreaterThanOrEqual(50);
     expect(commands.length).toBeLessThanOrEqual(70);
-    expect(commands.length).toBe(59);
+    expect(commands.length).toBe(65);
 
     const t = createTranslator('ar');
 
@@ -99,6 +101,7 @@ describe('All Registered Commands Suite', () => {
             if (cmd.data.name === 'settings') return 'view';
             if (cmd.data.name === 'module') return 'list';
             if (cmd.data.name === 'setup') return 'welcome';
+            if (cmd.data.name === 'ticket') return 'setup';
             return 'welcome';
           }),
           getChannel: vi.fn(() => dummyChannel),
@@ -129,7 +132,7 @@ describe('All Registered Commands Suite', () => {
           CLIENT_ID: '1563092248017506384',
           DEFAULT_LOCALE: 'ar',
         } as never,
-        db: {} as never,
+        db: db as never,
         registry,
         settings: {
           guildId: '123456789012345678',
