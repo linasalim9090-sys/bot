@@ -54,13 +54,14 @@ npm run build
 npm start
 ```
 
-## قائمة الأوامر المتاحة (المرحلة 0)
+## قائمة الأوامر المتاحة (59 أمرًا عبر 6 وحدات)
 
-1. `/ping`: يعرض زمن استجابة البوت وسرعة الاتصال ومدة التشغيل.
-2. `/help`: يعرض قائمة الأوامر المتاحة واستخدام كل أمر.
-3. `/doctor`: يفحص البيئة وقاعدة البيانات والصلاحيات والتوافقية.
-4. `/settings`: عرض وتعديل إعدادات السيرفر (اللغة، المنطقة الزمنية، إعادة الضبط).
-5. `/module`: عرض وإدارة وحدات البوت وتفعيلها أو تعطيلها (وحدة النواة محمية).
+1. **النواة والإعداد (Core & Setup - 6 أوامر):** `/setup`, `/settings`, `/module`, `/doctor`, `/ping`, `/help`
+2. **الإشراف والرقابة (Moderation - 15 أمرًا):** `/ban`, `/unban`, `/kick`, `/timeout`, `/untimeout`, `/warn`, `/warnings`, `/clearwarn`, `/purge`, `/slowmode`, `/lock`, `/unlock`, `/nick`, `/giverole`, `/removerole`
+3. **الأدوات والمساعدة (Utility - 15 أمرًا):** `/userinfo`, `/serverinfo`, `/botinfo`, `/avatar`, `/banner`, `/roleinfo`, `/channelinfo`, `/poll`, `/announce`, `/remind`, `/calc`, `/timestamp`, `/snowflake`, `/color`, `/randomnumber`
+4. **التسلية والألعاب (Fun - 10 أوامر):** `/dice`, `/coinflip`, `/eightball`, `/rps`, `/choose`, `/quote`, `/rate`, `/reverse`, `/trivia`, `/mathquiz`
+5. **المجتمع والتفاعل (Community - 9 أوامر):** `/afk`, `/suggest`, `/report`, `/membercount`, `/rules`, `/emojis`, `/boosters`, `/roles`, `/invites`
+6. **الأمان والحماية (Security - 4 أوامر):** `/lockdown`, `/raidmode`, `/whitelist`, `/scan`
 
 ## جدول الأوامر البرمجية (NPM Scripts)
 
