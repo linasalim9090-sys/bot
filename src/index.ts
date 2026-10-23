@@ -17,7 +17,7 @@ import { SettingsService } from './services/settings.service.js';
 
 export function getCommandsDirectory(): string {
   const distDir = path.join(process.cwd(), 'dist', 'modules');
-  if (process.env.NODE_ENV === 'production' && existsSync(distDir)) {
+  if (existsSync(distDir)) {
     return distDir;
   }
   return path.join(process.cwd(), 'src', 'modules');
